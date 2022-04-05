@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (C) 2020 Smile (<http://www.smile.fr>)
+# (C) 2021 Smile (<https://www.smile.eu>)
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 
 import sys
@@ -30,7 +30,12 @@ def audit_decorator(method):
         rule = self._get_audit_rule('create')
         if rule:
             new_values = record.read(load='_classic_write')
-            rule.log('create', new_values=new_values)
+            if new_values:
+                keys = new_values[0].keys()
+                for key in keys:
+                    if str(type(new_values[0][key])) == "<class 'markupsafe.Markup'>":
+                        new_values[0][key] = str(new_values[0][key])
+                rule.log('create', new_values=new_values)
         return result
 
     def audit_write(self, vals):
@@ -40,21 +45,32 @@ def audit_decorator(method):
                  self.ids != self._context.get('audit_rec_ids'))):
             rule = self._get_audit_rule('write')
         if rule:
-            old_values = self.read(load='_classic_write')
+            old_values = self.sudo().read(load='_classic_write')
         result = audit_write.origin(self, vals)
         if rule:
             if audit_write.origin.__name__ == '_write':
                 new_values = get_new_values(self)
             else:
-                new_values = self.read(load='_classic_write')
-            rule.log('write', old_values, new_values)
+                new_values = self.sudo().read(load='_classic_write')
+            if new_values:
+                keys = new_values[0].keys()
+                for key in keys:
+                    if str(type(new_values[0][key])) == "<class 'markupsafe.Markup'>":
+                        new_values[0][key] = str(new_values[0][key])
+                        old_values[0][key] = str(old_values[0][key])
+                rule.log('write', old_values, new_values)
         return result
 
     def audit_unlink(self):
         rule = self._get_audit_rule('unlink')
         if rule:
             old_values = self.read(load='_classic_write')
-            rule.log('unlink', old_values)
+            if old_values:
+                keys = old_values[0].keys()
+                for key in keys:
+                    if str(type(old_values[0][key])) == "<class 'markupsafe.Markup'>":
+                        old_values[0][key] = str(old_values[0][key])
+                rule.log('unlink', old_values)
         return audit_unlink.origin(self)
 
     if 'create' in method:

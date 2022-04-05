@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (C) 2011 Smile (<http://www.smile.fr>)
+# (C) 2022 Smile (<https://www.smile.eu>)
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 
 from odoo import api, fields, models, SUPERUSER_ID, _
@@ -113,7 +113,7 @@ class ResUsers(models.Model):
 
     @api.model
     def create(self, vals):
-        record = super(ResUsers, self).create(vals)
+        record = super(ResUsers, self.with_context(from_create_profile=vals.get('is_user_profile', False))).create(vals)
         if record.user_profile_id:
             record._update_from_profile()
         return record

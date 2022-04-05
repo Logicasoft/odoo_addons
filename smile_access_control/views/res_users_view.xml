@@ -88,7 +88,7 @@
             <field name="search_view_id" ref="base.view_users_search" />
             <field name="domain" eval="[('id', '!=', ref('base.user_root')), ('id', '!=', ref('base.user_admin')), ('is_user_profile', '=', True)]" />
             <field name="context">{'active_test': False, 'default_active': False, 'default_is_user_profile': True, 'is_user_profile': True}</field>
-            <field name="help"></field>
+            <field name="help"/>
         </record>
         <record id="action_res_user_profiles_tree_view" model="ir.actions.act_window.view">
             <field eval="1" name="sequence" />
@@ -130,7 +130,7 @@
             <field name="search_view_id" ref="base.view_users_search" />
             <field name="domain" eval="['|', ('id', '=', ref('base.user_root')), ('id', '=', ref('base.user_admin'))]" />
             <field name="context" eval="{'active_test': False}" />
-            <field name="help"></field>
+            <field name="help"/>
         </record>
         <record id="action_administrators_tree_view" model="ir.actions.act_window.view">
             <field eval="1" name="sequence" />
